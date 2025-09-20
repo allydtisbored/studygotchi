@@ -70,3 +70,9 @@ li {
     padding: 10px 20px;
     font-size: 16px;
 }
+.points {
+  font-size: 1.2em;
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+}
