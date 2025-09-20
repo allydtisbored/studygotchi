@@ -38,3 +38,79 @@ function updateRanking() {
 
 // Initial ranking display
 updateRanking();
+// Pomodoro logic
+let pomodoroDuration = 25 * 60; // 25 minutes
+let breakDuration = 5 * 60; // 5 minutes
+let timer;
+let timeLeft = pomodoroDuration;
+let isRunning = false;
+let isOnBreak = false;
+
+const timerDisplay = document.getElementById("timer-display");
+const statusDisplay = document.getElementById("pomodoro-status");
+
+document.getElementById("start-timer").addEventListener("click", () => {
+    if (!isRunning) {
+        isRunning = true;
+        timer = setInterval(updateTimer, 1000);
+        statusDisplay.textContent = isOnBreak ? "Status: Break Time!" : "Status: Focus!";
+    }
+});
+
+document.getElementById("stop-timer").addEventListener("click", () => {
+    clearInterval(timer);
+    isRunning = false;
+    statusDisplay.textContent = "Status: Paused";
+});
+
+document.getElementById("reset-timer").addEventListener("click", () => {
+    clearInterval(timer);
+    isRunning = false;
+    isOnBreak = false;
+    timeLeft = pomodoroDuration;
+    updateDisplay();
+    statusDisplay.textContent = "Status: Ready";
+});
+
+function updateTimer() {
+    timeLeft--;
+    updateDisplay();
+
+    if (timeLeft <= 0) {
+        clearInterval(timer);
+        isRunning = false;
+
+        if (!isOnBreak) {
+            // Earn points after study session
+            points += 25;
+            pointsDisplay.textContent = points;
+
+            // Make pet happy (optional)
+            petImage.classList.add("happy");
+            setTimeout(() => petImage.classList.remove("happy"), 1000);
+
+            alert("Great job! You completed a Pomodoro session! 🎉 +25 points!");
+
+            // Switch to break
+            isOnBreak = true;
+            timeLeft = breakDuration;
+            statusDisplay.textContent = "Status: Break Time!";
+            timer = setInterval(updateTimer, 1000);
+            isRunning = true;
+        } else {
+            // Break is over
+            isOnBreak = false;
+            timeLeft = pomodoroDuration;
+            statusDisplay.textContent = "Status: Ready";
+            updateDisplay();
+        }
+
+        updateRanking(); // Refresh leaderboard
+    }
+}
+
+function updateDisplay() {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
